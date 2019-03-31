@@ -10,9 +10,12 @@
   "dependencies": {
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
+    "axios": "^0.18.0",
+    "d3": "^5.9.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "vis": "^4.21.0"
   },
   "scripts": {
     "start": "react-scripts start",

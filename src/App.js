@@ -13,6 +13,8 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 
+import * as axios from 'axios';
+
 const styles = (theme) => ({
 	root: {
 		flexGrow: 1,
@@ -43,6 +45,18 @@ const styles = (theme) => ({
 	plotButton: {
 		margin: 5,
 	},
+	image: {
+		height: 500,
+		width: 1000,
+	},
+	image2: {
+		height: 500,
+		width: 1000,
+	},
+	relatedness: {
+		fontSize: 18,
+		padding: 20,
+	}
 });
 
 class App extends React.Component {
@@ -54,7 +68,9 @@ class App extends React.Component {
 			dialogOpened: false,
 			teamSize: 2,
 			items: [{name: "", idea: ""}, {name: "", idea: ""}],
-			output: "",
+			imageName: "",
+			names: [],
+			relatedness: null,
 		};
 	}
 	render () {
@@ -107,12 +123,22 @@ class App extends React.Component {
 							})}
 						</TableBody>
 					</Table>
+					{this.state.relatedness &&
+						<div className={classes.relatedness}>Relatedness: {Math.round(this.state.relatedness * 10000) / 100}%</div>}
 					<Button className={classes.addButton} onClick={this.addInput}> <AddIcon /> Add Person</Button>
 					<br />
 					<br />
 					<Button className={classes.plotButton} variant="contained" color="primary" onClick={this.getOutput}>Plot</Button>
+					<img className={classes.image} src={this.state.imageName} alt=" " />
+					<img className={classes.image2} src={this.state.imageName + ".3.svg"} alt=" " />
+					
+					{this.state.names.map((name, index) => {
+						if (index < 5)
+							return <div>{name}</div>
+						else
+							return null;
+					})}
 				<div>
-					<img src={this.state.output} alt="output" />
 				</div>
 				</div>
 				<Dialog
@@ -169,7 +195,16 @@ class App extends React.Component {
 			this.openDialog("You must have enough people to divide into even teams!");
 			return;
 		}
-		this.setState({ output: "https://chartio.com/images/tutorials/scatter-plot/Scatter-Plot-Weight-and-Height-Scatter-Plot-Trendline.png" })
+		axios.get('http://localhost:8000/?q=' + this.state.items.join("+")).then((d) => {
+			if (d && d.data) {
+				if (d.data.filepath)
+					this.setState({imageName: 'http://localhost:8000/' + d.data.filepath});
+				if (d.data.names)
+					this.setState({ names: d.data.names });
+				if (d.data.relatedness)
+					this.setState({ relatedness: d.data.relatedness });
+			}
+		});
 	}
 	openDialog = (text, title="") => {
 		this.setState({ dialogOpened: true, dialogText: text, dialogTitle: title });
